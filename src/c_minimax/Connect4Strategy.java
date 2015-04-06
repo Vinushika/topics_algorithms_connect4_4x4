@@ -23,7 +23,7 @@ public class Connect4Strategy implements InterfaceStrategy {
             	posNew.setColor(iPos, player); //fill it
             	float score = -1; //initialize at -1, you'll see why
             	if (contextMapping.containsKey(posNew.getRawPosition())) {
-            	    score = contextMapping.get(posNew.getRawPosition()).getBestScoreSoFar();
+            	    score = contextMapping.get(posNew.getRawPosition()).getBestScoreSoFar(); //get the "current best score"
             	}
             	if (score <= 0) {
                 	int isWin = posNew.isWinner(); //check if it wins
