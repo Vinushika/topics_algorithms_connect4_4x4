@@ -1,11 +1,13 @@
 package c_minimax;
 
 import java.util.HashMap;
+import java.util.Map;
 
 //author: Gary Kalmanovich; rights reserved
 
 public class Connect4Strategy implements InterfaceStrategy {
 	HashMap<Long,Integer> hashedPositions = new HashMap<>();
+	HashMap<Long, InterfaceSearchInfo> contextMapping = new HashMap<Long, InterfaceSearchInfo>();
     @Override
     public void getBestMove(InterfacePosition position, InterfaceSearchInfo context) {
         // Note, return information is embedded in context
@@ -19,22 +21,28 @@ public class Connect4Strategy implements InterfaceStrategy {
             InterfacePosition posNew = new Connect4Position(position);
             if (posNew.getColor(iPos) == 0 && ((Connect4Position)posNew).isPositionFillable(iPos) ) { // This is a free spot that we can fill
             	posNew.setColor(iPos, player); //fill it
-            	int isWin = posNew.isWinner(); //check if it wins
             	float score = 0;
-            	if(isWin == -1){ //if win is not decided, go down the tree
-            		//define our stuff
-            		posNew.setPlayer(opponent);
-
-            		//create a new context so we can get its score from the children
-            		InterfaceSearchInfo newContext = new Connect4SearchInfo();
-            		getBestMove(posNew,newContext);
-            		score = -1 * newContext.getBestScoreSoFar();
-            	}else{ //it is decided, so check if it's a draw or not. You can't make a losing move in Connect4, either.
-            		score = isWin == 0 ? 0 : 1;
+            	if (contextMapping.containsKey(posNew.getRawPosition())) {
+            	    score = contextMapping.get(posNew.getRawPosition()).getBestScoreSoFar();
+            	}
+            	else {
+            	    contextMapping.put(posNew.getRawPosition(), context);
+                	int isWin = posNew.isWinner(); //check if it wins
+                	if(isWin == -1){ //if win is not decided, go down the tree
+                		//define our stuff
+                		posNew.setPlayer(opponent);
+                		//create a new context so we can get its score from the children
+                		InterfaceSearchInfo newContext = new Connect4SearchInfo();
+                		getBestMove(posNew,newContext);
+                		score = -1 * newContext.getBestScoreSoFar();
+                	}else{ //it is decided, so check if it's a draw or not. You can't make a losing move in Connect4, either.
+                		score = isWin == 0 ? 0 : 1;
+                	}
             	}
             	//we want a max 
             	if(score > context.getBestScoreSoFar()){
             		context.setBestMoveSoFar(iPos,score);
+
             		if (score > 0)
             			return; //prune after finding the first good move
             	}
