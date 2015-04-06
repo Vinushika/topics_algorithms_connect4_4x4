@@ -26,7 +26,6 @@ public class Connect4Strategy implements InterfaceStrategy {
             	    score = contextMapping.get(posNew.getRawPosition()).getBestScoreSoFar();
             	}
             	else {
-            	    contextMapping.put(posNew.getRawPosition(), context);
                 	int isWin = posNew.isWinner(); //check if it wins
                 	if(isWin == -1){ //if win is not decided, go down the tree
                 		//define our stuff
@@ -38,6 +37,8 @@ public class Connect4Strategy implements InterfaceStrategy {
                 	}else{ //it is decided, so check if it's a draw or not. You can't make a losing move in Connect4, either.
                 		score = isWin == 0 ? 0 : 1;
                 	}
+                	contextMapping.put(posNew.getRawPosition(), context);
+
             	}
             	//we want a max 
             	if(score > context.getBestScoreSoFar()){
