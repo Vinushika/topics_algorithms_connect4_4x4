@@ -18,16 +18,17 @@ public class Connect4Strategy implements InterfaceStrategy {
         //TODO Implement strategy. Note, this is not that different from TicTacToeStrategy that is now visible.
         // Nonetheless, if you want to be efficient, you may want to make it somewhat different.
         for ( InterfaceIterator iPos = new Connect4Iterator(4,4); iPos.isInBounds(); iPos.increment() ) {
-            InterfacePosition posNew = new Connect4Position(position);
+            InterfacePosition posNew = new Connect4Position(position,hashedPositions);
             if (posNew.getColor(iPos) == 0 && ((Connect4Position)posNew).isPositionFillable(iPos) ) { // This is a free spot that we can fill
             	posNew.setColor(iPos, player); //fill it
-            	float score = 0;
+            	float score = -1; //initialize at -1, you'll see why
             	if (contextMapping.containsKey(posNew.getRawPosition())) {
             	    score = contextMapping.get(posNew.getRawPosition()).getBestScoreSoFar();
             	}
-            	else {
+            	if (score <= 0) {
                 	int isWin = posNew.isWinner(); //check if it wins
                 	if(isWin == -1){ //if win is not decided, go down the tree
+                    	contextMapping.put(posNew.getRawPosition(), context);
                 		//define our stuff
                 		posNew.setPlayer(opponent);
                 		//create a new context so we can get its score from the children
@@ -37,7 +38,6 @@ public class Connect4Strategy implements InterfaceStrategy {
                 	}else{ //it is decided, so check if it's a draw or not. You can't make a losing move in Connect4, either.
                 		score = isWin == 0 ? 0 : 1;
                 	}
-                	contextMapping.put(posNew.getRawPosition(), context);
 
             	}
             	//we want a max 
